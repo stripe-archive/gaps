@@ -1,0 +1,55 @@
+db:
+  # Which database name to use.
+  database: gaps
+  # URL to connect to your MongoDB instance (where all state is
+  # persisted). Note that Gaps stores some interesting state, such as
+  # people's filter configuration and group categorization.
+  mongodb_url: mongodb://localhost:27017
+
+# Your favicon
+favicon:
+
+# The public URL associated with this Gaps instance.
+gaps_url: https://gaps.example.com
+
+info:
+  # The Google Apps domain to restrict this Gaps instance to.
+  domain: example.com
+  # The name of the company, purely for display purposes.
+  company_name: Example Company
+
+notify:
+  # Whether to send an email notifying people when a new list is
+  # created. If disabled, will instead just print the email to the
+  # console. (Note you must have a functioning sendmail setup for this
+  # to work; a TODO is to integrate with an email provider like
+  # Mailgun.)
+  send_email: false
+  # What email address to notify.
+  to: all-bots@example.com
+  # What email address to send from. In Stripe's email transparency
+  # setup, automated mail is usually sent from a list name, so human
+  # replies get directed to the list.
+  from: all@example.com
+
+oauth:
+  # The client ID of your OAuth application in from
+  # https://console.developers.google.com/project.
+  client_id:
+  # The client secret of your OAuth application in from
+  # https://console.developers.google.com/project.
+  client_secret:
+  # Where Google should send people post-OAuth. Note you must add this
+  # to your allowed redirect URIs in the Google developer console.
+  redirect_uri: http://localhost:3500/oauth2callback
+
+# What port to bind
+port: 3500
+
+session:
+  # This should be a long random string: `openssl rand -base64 129`
+  # should do it
+  secret:
+  # Whether to use secure cookies. Turn this on if you're using SSL,
+  # and leave off otherwise.
+  secure: false

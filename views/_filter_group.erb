@@ -1,0 +1,34 @@
+<%
+skip_inbox = @user.archive?(group._id)
+label = @user.filter_label(group._id) || group.default_filter_label
+%>
+
+<li class="list-group-item" id='lst-<%= group.group_email %>' data-group-id='<%= group._id %>'>
+  <h4 class="list-group-item-heading">
+    <a href="<%= group.page %>"><%= group.group_email %></a>
+  </h4>
+  <p class="list-group-item-text">
+    <%= group.description %>
+  </p>
+  <div class="row">
+    <div class="col-xs-4 input-group">
+      <span class="input-group-addon">Label:</span>
+      <input name='group[<%= group._id %>][label]'
+             type="text"
+             class="filter-label"
+             class="form-control"
+             value='<%= label %>'
+             placeholder="Gmail Label">
+    </div>
+      <label class="archive"
+             title="If checked, archive all email to this list, unless it is addressed to you or an non-archived list.">
+        <input type="checkbox"
+               class="filter-archive"
+               name='group[<%= group._id %>][archive]'
+               value="archive"
+               <%= skip_inbox ? "checked" : "" %>
+               >
+        Archive
+      </label>
+  </div>
+</li>

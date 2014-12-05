@@ -1,0 +1,8 @@
+#sidenav {
+  width: 200px;
+}
+
+#sidenav.affix {
+  position: fixed;
+  top: 20px;
+}

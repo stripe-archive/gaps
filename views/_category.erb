@@ -1,0 +1,10 @@
+<div class="panel panel-default" id='cat-<%= category %>' data-category='<%= category %>'>
+  <div class="panel-heading"><h3><%= category %></h3></div>
+  <div class="panel-body">
+    <ul class="list-group">
+      <% groups.each do |group| %>
+        <%== erb group_partial, :locals => {:group => group} %>
+      <% end %>
+    </ul>
+  </div>
+</div>

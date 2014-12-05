@@ -1,0 +1,87 @@
+<%
+quotes = [
+ 'Random quote',
+ 'Another random quote'
+]
+-%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Gaps</title>
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="css/gaps.css" rel="stylesheet" media="screen">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+    <% if configatron.favicon %>
+    <link rel="shortcut icon" href="<%= configatron.favicon %>">
+    <% end %>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//use.typekit.net/weg5vop.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+</head>
+<body class="tk-futura-pt">
+  <div class="navbar navbar-default">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/">GAPS</a>
+      </div>
+        <ul class="nav navbar-nav">
+          <li class='<%= active_if_on('/subs') %>'>
+            <a href="/subs">Subscriptions</a>
+          </li>
+          <li class='<%= active_if_on('/filters') %>'>
+            <a href="/filters">Filters</a>
+          </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <% if logged_in? %>
+            <li>
+              <form action="/logout" method="POST">
+                <%== csrf_tag %>
+                <button type="submit" class="btn btn-default navbar-btn">Sign out</button>
+              </form>
+            </li>
+          <% elsif @has_lister != false %>
+            <li><a href="/login/gafyd">Sign in</a></li>
+          <% end %>
+        </ul>
+    </div>
+  </div>
+
+  <div class="container">
+    <%
+      [:error, :notice].each do |item|
+        next unless flash[item]
+    %>
+      <p> <%= flash[item] %> </p>
+    <% end  %>
+
+<% if @user %>
+<div class="pull-right">
+  <img src="<%= @user.image_url %>" />
+</div>
+
+<div class="page-header">
+  <h1><%= configatron.info.company_name %>'s Google Groups <small>Welcome, <b><%= @user.username %></b>!</small></h1>
+</div>
+<% end %>
+
+    <%== yield %>
+  </div>
+  <script src="//code.jquery.com/jquery.js"></script>
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/gaps.js"></script>
+  <script>
+    window.CSRF = '<%== csrf_token %>';
+    $('.dropdown-toggle').dropdown();
+  </script>
+</body>
+</html>

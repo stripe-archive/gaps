@@ -1,0 +1,93 @@
+<div class="well">
+  <p>This page lets you generate Gmail filters for your list
+  subscriptions. You can assign labels, and pick whether the list is
+  important enough to go to your inbox. </p>
+</div>
+
+<div class="row">
+  <div class="col-md-3">
+    <div id="sidenav" role="complementary">
+      <ul class="nav" role="navigation">
+        <li class="list-group-item">
+          <form action="/filters/generate" method="GET" role="form">
+            <button type="submit" class="btn btn-default">Download filters</button>
+          </form>
+        </li>
+        <li class="list-group-item">
+          <form action="/filters/source" method="GET" role="form">
+            <button type="submit" class="btn btn-default">View source</button>
+          </form>
+        </li>
+        <li class="list-group-item">
+          <form action="/filters/upload" method="POST" role="form" id="filters-upload">
+            <button type="submit" class="btn btn-default">Add to Gmail</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-9" role="main">
+    <h2 id="nav-emails">Your Emails</h2>
+
+    <p> The generated filters will not archive an email that is
+    directed to your address. So if an email is sent <tt>to: <%= @user.email %>, cc: boringlist@<%= configatron.info.domain %></tt>,
+    it will still hit your inbox even if you usually archive <tt>boringlist@<%= configatron.info.domain %></tt>.</p>
+
+    <div class="row">
+      <div class="col-xs-4">
+        <ul class="list-group" class="affix-top" id="alternate-emails">
+          <li class="list-group-item"><%= @user.email %></li>
+          <% @user.alternate_emails.each do |email| %>
+            <li class="list-group-item">
+              <form class="delete-email form form-inline"
+                    action='/ajax/users/<%= @user._id%>/alternate_email/delete'
+                    method="POST">
+                <button type="submit" class="btn btn-xs" aria-hidden="true">&times;</button>
+                <%= email %>
+                <input type="hidden" name="email" value='<%= email %>'>
+                <%== csrf_tag %>
+              </form>
+            </li>
+          <% end %>
+        </ul>
+        <form role="form"
+              class="add-email"
+              action='/ajax/users/<%= @user._id %>/alternate_email' method="POST">
+          <label for="alternateEmail" class="col-lg-2 control-label">Email</label>
+          <div class="col-lg-10">
+            <%== csrf_tag %>
+            <input type="email" name="email" class="form-control" id="alternateEmail" placeholder="Email">
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <h2 id="nav-lists">Subscribed lists</h2>
+    <%== erb :_category_list, :locals => {:groups => @groups} %>
+
+    <form method="POST" action="/ajax/filters" method="POST" id="filter-form">
+      <%== csrf_tag %>
+
+      <div id="categories">
+        <% @groups.each do |category, groups| %>
+          <%== erb :_category, :locals => {:category => category, :groups => groups, :group_partial => :_filter_group} %>
+        <% end %>
+      </div>
+    </form>
+  </div>
+
+
+
+  <div id="_templates" style="display:none;">
+  </div>
+
+</div> <!-- .col-md-9 -->
+</div> <!-- .row -->
+
+<script>
+  $(function() {
+    $('.archive').tooltip({placement: 'right', container: 'body'});
+    GAPS.setupEmails();
+    GAPS.setupFilters();
+  });
+</script>

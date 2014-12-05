@@ -1,0 +1,14 @@
+## If you want more flexible gmail filters, you can use this source file to base them on.
+
+require 'gaps/filter'
+
+puts Gaps::Filter.generate_filter_xml(<%== @user.all_emails.inspect %>,
+       {<% Gaps::Filter.translate_to_gmail_britta_filters(@user.filters).each do |list, spec| -%>
+         '<%== list %>' => {'label' => '<%== spec['label'] %>', <% if spec['archive'] %> 'archive' => true <% end %>},<%- end %>
+       }) do
+  ## Drop in your additional filters here. Example:
+  # filter {
+  #   has ['subject:pre-shipped']
+  #   label 'pre-shipped'
+  # }
+end

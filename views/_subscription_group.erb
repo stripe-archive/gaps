@@ -1,0 +1,35 @@
+<%
+membership = @user.group_member?(group)
+through_list = @user.group_member_through_list(group)
+direct_membership = membership && !through_list
+indirect_membership = membership && through_list
+-%>
+
+<li class="list-group-item" id='lst-<%= group.group_email %>' data-group-id='<%= group._id %>'>
+  <h4 class="list-group-item-heading">
+    <input type="checkbox" name="group[<%= group._id %>][member]" <% if direct_membership %>checked="true"<% end %> />
+    <input type="hidden" name="group[<%= group._id %>][was_member]" value="<%= direct_membership ? 'true' : 'false' %>" />
+    <a href="<%= group.page %>"><%= group.group_email %></a>
+    <% if indirect_membership %>
+      <span class="label label-default">subscribed through <a href='#lst-<%= through_list%>'><%= through_list %></a></span>
+    <% elsif direct_membership %>
+      <span class="label label-primary">subscribed</span>
+    <% end %>
+    <div class="btn-group pull-right move-dropdown">
+      <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></button>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <span class="input-group">
+            <span class="input-group-addon">
+              Move to
+            </span>
+            <input type="text" class="form-control" placeholder="Category" name="category" data-group='<%= group._id %>'></input>
+          </span>
+        </li>
+      </ul>
+    </div>
+  </h4>
+  <p class="list-group-item-text">
+    <%= group.description %>
+ </p>
+</li>

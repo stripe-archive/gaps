@@ -1,0 +1,35 @@
+default: &default
+  cache:
+    # How large of a threadpool to maintain for populating the cache
+    # of what each list is subscribed to. (Note for implementation
+    # reasons we'll actually be allocating 2x pool_size threads. Gaps
+    # is network-bound, so having a larger number here than CPUs
+    # should be fine.)
+    pool_size: 10
+
+    # Whether to serve possibly stale cache entries, in the name of a
+    # faster pageload. Generally which list is subscribed to what
+    # doesn't change that much, so allowing a stale load is fine.
+    allow_stale: true
+
+  healthcheck:
+    # If $host_maintenance_dir/healthcheck.txt exists but is chmod'd
+    # 000, consider this service down.
+    host_maintenance_dir: /tmp/healthcheck/host
+    # If $service_maintenance_dir/$name exists, consider this service
+    # down.
+    service_maintenance_dir: /tmp/healthcheck/service
+    name: gaps
+
+  oauth:
+    common_scopes:
+      - email
+      - profile
+    lister_scopes:
+      - https://www.googleapis.com/auth/admin.directory.user.readonly
+      - https://www.googleapis.com/auth/admin.directory.group.readonly
+      - https://apps-apis.google.com/a/feeds/emailsettings/2.0/
+      - https://www.googleapis.com/auth/admin.directory.group.member
+
+development: *default
+production: *default

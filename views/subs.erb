@@ -1,0 +1,48 @@
+<div class="well">
+<p> The following are the Google Groups you can join, and whether you
+are a member. When a new Group is created, the listing here should be
+updated within 10 minutes and an automated email sent to <%= configatron.notify.to %>. </p>
+
+<p> You can manage your list subscriptions here. </p>
+</div>
+
+<%== erb :_category_list, :locals => {:groups => @groups} %>
+
+  <form method="POST" action="/subs">
+  <%== csrf_tag %>
+<p> <input type="submit" value="Submit changes" /> </p>
+
+<div id="categories">
+  <% @groups.each do |category, groups| %>
+    <%== erb :_category, :locals => {:category => category, :groups => groups, :group_partial => group_partial} %>
+  <% end %>
+</div>
+
+<p> <input type="submit" value="Submit changes" /> </p>
+  </form>
+</div>
+
+<form method="POST" action="/refresh">
+  <%== csrf_tag %>
+  <input type="submit" onclick="return window.confirm('Are you sure? Can take a bit to refresh since we need to requery every group.')" value="Invalidate the group cache" /> (useful if you want a new list to appear right now, but may take a few minutes to repopulate)
+</form>
+
+<% if @user.admin? %>
+<h2> (Admin only) Login As </h2>
+<form method="POST" action="/login_as">
+<%== csrf_tag %>
+<p> Username: <input type="text" name="username" /> <input type="submit" value"Login as user" /></p>
+</form>
+<% end %>
+
+<div id="_templates" style="display:none;">
+  <div data-template="category">
+    <%== erb :_category, :locals => {:category => '%NAME%', :groups => []} %>
+  </div>
+</div>
+
+<script>
+  $(function() {
+    GAPS.setupMoveDropdowns();
+  });
+</script>

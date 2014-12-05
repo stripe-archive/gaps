@@ -1,0 +1,4 @@
+#!/bin/sh
+
+PREFIX=$(dirname "$0")
+exec rerun -p '**/*.{rb,yaml}' $PREFIX/gaps_server.rb

@@ -1,0 +1,18 @@
+<% if @has_lister %>
+
+<p>
+  <a href="/login/gafyd">Sign in</a> via your <%= configatron.info.domain %> Google account to manage your group subscriptions and email settings.
+</p>
+
+<% else %>
+
+<div style="border:outset 2px; width:50%; padding:10px">
+<p>
+  <a href="/login/gafyd?type=lister">Sign in</a> as the "lister"
+  user. Gaps will use your credentials to obtain and update the list
+  of all groups at the domain and their members. For best results, you
+  should be a domain admin.
+</p>
+</div>
+
+<% end %>
