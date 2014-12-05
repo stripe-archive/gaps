@@ -1,4 +1,4 @@
 #!/bin/sh
 
 cd "$(dirname "$0")/.."
-sudo docker run -ti -e RACK_ENV=production -p 3500:3500 -v $(pwd)/site.yaml:/gaps/site.yaml:ro gaps $@
+sudo docker run -ti -e RACK_ENV=production -p 3500:3500 -v $(pwd)/site.yaml:/gaps/site.yaml:ro stripeoss/gaps $@
