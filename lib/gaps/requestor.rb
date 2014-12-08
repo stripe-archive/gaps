@@ -115,6 +115,12 @@ module Gaps
         )
     end
 
+    def get_group_settings(group_email)
+      request(:lister, "Retrieving settings for group",
+        uri: uri('https://www.googleapis.com/groups/v1/groups', group_email)
+        )
+    end
+
     private
 
     def uri(*args)

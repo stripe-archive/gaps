@@ -58,9 +58,10 @@ quotes = [
   <div class="container">
     <%
       [:error, :notice].each do |item|
-        next unless flash[item]
+        # TODO: do you really need to do this flash.now || flash thing?
+        next unless message = (flash.now[item] || flash[item])
     %>
-      <p> <%= flash[item] %> </p>
+      <p> <%= message %> </p>
     <% end  %>
 
 <% if @user %>
