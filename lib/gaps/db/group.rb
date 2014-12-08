@@ -11,7 +11,8 @@ module Gaps::DB
     key :deleted, Boolean, default: false
 
     key :category, String
-    key :config, Hash
+    key :config, Hash # config JSON tag in description
+    key :group_settings, Hash
 
     def self.build_index
       self.ensure_index(:group_email, unique: true)
@@ -88,7 +89,20 @@ EOF
       label.gsub(%r{\Aall(/.*)?\z}) { "everyone#{$1}" }
     end
 
-    def update_config
+    def update_config(user=User.lister)
+      if configatron.populate_group_settings
+        begin
+          settings = user.requestor.get_group_settings(self.group_email)
+        rescue Google::APIClient::ClientError => e
+          # Be helpful to people
+          if e.message =~ /Domain cannot use Api, Groups service is not installed/
+            e.message << ' (HINT: you need to be on Google Groups for Business to use the Groups service. You can turn off groups settings population by disabling the `populate_group_settings` key.)'
+          end
+          raise
+        end
+        self.group_settings = settings
+      end
+
       self.config = parse_config_from_description
       self.deleted = false
       # Heuristically guess the group's category. TODO: consider
@@ -101,7 +115,35 @@ EOF
     end
 
     def hidden?
-      self.config['display'] || self.group_email.start_with?('acl-') || self.group_email.start_with?('private-')
+      if configatron.permissions.privacy_settings.gaps_scheme &&
+          custom_hidden?
+        return true
+      end
+
+      if configatron.permissions.privacy_settings.api_scheme &&
+          group_settings_hidden?
+        return true
+      end
+
+      return false
+    end
+
+    def custom_hidden?
+      # Our custom permissioning scheme (probably going to deprecate
+      # this, but Stripe's found it convenient while we had limited
+      # permissioning needs).
+      self.config['display'] ||
+        self.group_email.start_with?('acl-') ||
+        self.group_email.start_with?('private-')
+    end
+
+    # Is it hidden according to the Google Groups settings API?
+    def group_settings_hidden?
+      settings = self.group_settings
+
+      !('true' == settings['showInGroupDirectory'] &&
+        ['ANYONE_CAN_JOIN', 'ALL_IN_DOMAIN_CAN_JOIN'].include?(settings['whoCanJoin']) &&
+        ['ANYONE_CAN_VIEW', 'ALL_IN_DOMAIN_CAN_VIEW'].include?(settings['whoCanViewGroup']))
     end
 
     def self.boot
@@ -131,34 +173,36 @@ EOF
 
       initialized = Gaps::DB::State.initialized?
 
+      user = User.lister
+      futures = user.requestor.group_list.map do |groupinfo|
+        Thread.future(thread_pool) do
+          email = groupinfo.fetch('email')
+          # Kind of janky, but you get back deleted groups from the API
+          # as <name>-deleted-4301b@
+          next if email =~ /-deleted/
+
+          group = find_or_initialize_by_group_email(email)
+          group.description = groupinfo.fetch('description')
+          group.direct_members_count = groupinfo.fetch('directMembersCount')
+          group.update_config(user)
+
+          if group.new_record?
+            log.info("Creating a new group", group: group)
+            # Don't notify about display-restricted lists
+            group.notify_creation if initialized && !group.hidden?
+            group.save!
+          elsif group.changed?
+            log.info("Updating existing group", group: group)
+            group.save!
+          end
+
+          group._id
+        end
+      end
+
       # Could also store a refreshed_at prop in the DB, basically
       # doing mark-sweep. But this is simpler.
-      live_groups = Set.new
-
-      user = User.lister
-      user.requestor.group_list.map do |groupinfo|
-        email = groupinfo.fetch('email')
-        # Kind of janky, but you get back deleted groups from the API
-        # as <name>-deleted-4301b@
-        next if email =~ /-deleted/
-
-        group = find_or_initialize_by_group_email(email)
-        group.description = groupinfo.fetch('description')
-        group.direct_members_count = groupinfo.fetch('directMembersCount')
-        group.update_config
-
-        if group.new_record?
-          log.info("Creating a new group", group: group)
-          # Don't notify about display-restricted lists
-          group.notify_creation if initialized && !group.hidden?
-          group.save!
-        elsif group.changed?
-          log.info("Updating existing group", group: group)
-          group.save!
-        end
-
-        live_groups << group._id
-      end
+      live_groups = Set.new(futures.map(&:~))
 
       # Garbage-collect any groups that don't exist anymore
       self.find_each(deleted: false) do |group|

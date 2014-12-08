@@ -22,14 +22,31 @@ default: &default
     name: gaps
 
   oauth:
+    # What scopes to ask for from each user upon login.
     common_scopes:
       - email
       - profile
+    # What scopes to ask for from the lister upon initial login.
     lister_scopes:
       - https://www.googleapis.com/auth/admin.directory.user.readonly
       - https://www.googleapis.com/auth/admin.directory.group.readonly
       - https://apps-apis.google.com/a/feeds/emailsettings/2.0/
       - https://www.googleapis.com/auth/admin.directory.group.member
+      - https://www.googleapis.com/auth/apps.groups.settings
+
+  permissions:
+    privacy_settings:
+      # Whether to use the custom Gaps scheme (e.g. name starting with
+      # acl-) to decide if a list is private.
+      gaps_scheme: true
+      # Whether to use the Google Groups Settings API to decide if a
+      # list is private. (Can be composed with the Gaps scheme.)
+      api_scheme: false
+
+  # Whether to fetch the Google Groups settings upon group
+  # refresh. Needed to make the api_scheme work. In the future will
+  # probably power other features.
+  populate_group_settings: true
 
 development: *default
 production: *default

@@ -49,7 +49,8 @@ site.yaml`. You'll need:
 2. Create a
    [new project](https://console.developers.google.com/project).
 3. Under the "APIs & auth" accordian for that project, select the
-   "APIs" tab. Enable the Google+ API and Admin SDK.
+   "APIs" tab. Enable the Google+ API, Admin SDK, and Group Settings
+   API.
 4. Under the same accordian, select the "Credentials" tab. Create a
    new "Web application" Client ID. Add your desired redirect URI and
    authorized origins. (In development that'll probably be
@@ -77,18 +78,30 @@ configuration file. Clone this repository and execute
 # Permissions
 
 Gaps uses your domain admin's credentials to perform most actions
-(listing all groups, joining a group), so by default you can see and
-join any group independent of their Google permissions.
+(listing all groups, joining a group). So permissions are entrusted to
+Gaps's business logic rather than your Google settings directly.
 
-Private lists can be created by one of three ways:
+Gaps currrently comes with two schemes to mark a list as private. Any
+private lists are currently completely omitted from Gaps: they'll be
+left out of the directory listing, their creation won't be emailed
+about, and users won't be able to join them.
+
+The first is the Gaps-custom scheme, which grew out of Stripe's desire
+for a very lightweight private-group creation. It's probably a
+reasonable place to start if you are starting with very few private
+lists:
 
 - Prefixing the name with `private-`.
 - Prefixing the name with the less-cumbersome but more-obscure `acl-`.
 - Adding a JSON tag as the last line of the group description with a
   "display" setting as follows: `{"display": "none"}`
 
-These will be omitted from the directory listing, won't be emailed
-about, and users won't be able to join them.
+The second is using the Google Groups Settings API. This checks that
+the group is set to be shown in the group directory, that anyone in
+the domain can join, and that anyone in the domain can view it.
+
+Choose your privacy schemes using the Configatron keys under
+`permissions.privacy_settings`.
 
 # Contributions
 
@@ -101,9 +114,6 @@ Gaps doesn't yet support. For example:
   the appropriate settings.
 - Persisting your group categorization settings back to the Group (as
   part of its description tag).
-- Permissioning based off Google settings. Rather than use our custom
-  visibility scheme, we could use the group's settings determine
-  whether it's considered visible.
 - More flexible filter generation, or better story for clearing
   filters.
 - Displaying your private lists.

@@ -155,8 +155,8 @@ module Gaps::DB
 
       user.image_url = image_url
 
-      if user.grant_type == 'lister'
-        log.info("Not updating credentials for the lister user", user: self)
+      if user.grant_type == 'lister' && grant_type != 'lister'
+        log.info("Not modifying credential settings for the lister user", user: self)
       else
         user.update_credentials(client)
         user.grant_type = grant_type
