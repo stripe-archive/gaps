@@ -60,7 +60,9 @@ module Gaps
     end
 
     def membership_list_for_user
-      membership_list(user.email)
+      Gaps::DB::Cache.with_cache_key(user.membership_list_cache_key) do
+        membership_list(user.email)
+      end
     end
 
     def membership_list(email)

@@ -15,6 +15,13 @@ module Gaps::DB
       @thread_pool ||= Thread::Pool.new(configatron.cache.pool_size)
     end
 
+    def self.invalidate(key)
+      @mutex.synchronize do
+        @cache.delete(key)
+        self.delete(key: key)
+      end
+    end
+
     def self.warm_cache
       self.find_each do |entry|
         @cache[entry.key] = entry

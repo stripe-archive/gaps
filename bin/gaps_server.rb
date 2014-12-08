@@ -219,6 +219,8 @@ module Gaps
           else
             @user.requestor.remove_from_group(group.group_email)
           end
+
+          Gaps::DB::Cache.invalidate(@user.membership_list_cache_key)
         end
       end
 

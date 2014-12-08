@@ -112,6 +112,10 @@ module Gaps::DB
       self.admin = results.fetch('isAdmin')
     end
 
+    def membership_list_cache_key
+      "membership_list:#{email}"
+    end
+
     def self.oauth_url(lister)
       authorization_options = {access_type: :online}
       scopes = configatron.oauth.common_scopes.dup
