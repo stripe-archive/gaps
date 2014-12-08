@@ -166,10 +166,12 @@ module Gaps
           invalid_credentials = true
           client = get_client(client_spec)
           retry
-        elsif e.message =~ /\ARequest rate higher than configured/ && rate_limit < 3
+        elsif e.message =~ /\ARequest rate higher than configured/ && rate_limit < 5
           # If we just exceeded the rate limit, cool off
           rate_limit += 1
-          sleep(2**rate_limit + 3 * rand)
+          sleeping = 2**rate_limit + 3 * rand
+          log.info('Just hit rate limit', rate_limit: rate_limit, sleep: sleeping)
+          sleep(sleeping)
           retry
         else
           raise
