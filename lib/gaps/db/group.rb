@@ -192,6 +192,11 @@ EOF
       end
     end
 
+    # Eventually, make these replicate Google's permissioning logic.
+    def viewable?(user)
+      !deleted && !hidden?
+    end
+
     def self.categorized(user, subscribed_only=false)
       groups = self.viewable(user).sort_by {|group| group.group_email}
       if subscribed_only

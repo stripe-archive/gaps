@@ -210,6 +210,10 @@ module Gaps
         was_member = group_conf[:was_member] == 'true'
         if member != was_member
           group ||= Gaps::DB::Group.find(group_id)
+          if !group.viewable?(@user)
+            die("Trying to update subscription to a group you do not have permission to access: #{group_id}")
+          end
+
           if member
             @user.requestor.add_to_group(group.group_email)
           else
