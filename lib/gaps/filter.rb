@@ -57,7 +57,7 @@ module Gaps::Filter
     # Hack: mark all non-archived lists as user_emails so they get
     # added to the "unless_directed" part of archive logic.
     desired = generic_lists.
-      select {|list, spec| spec['archive']}.
+      reject {|list, spec| spec['archive']}.
       map {|list, _| list}
 
     unarchived = user_emails + desired
