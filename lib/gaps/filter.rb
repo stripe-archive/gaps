@@ -27,15 +27,18 @@ module Gaps::Filter
     props = filterset.filters.map(&:generate_xml_properties)
     futures = props.map do |filter_text|
       Thread.future(Gaps::DB::Group.thread_pool) do
-        retried = false
+        tries = 0
         begin
           user_object.requestor.create_filter(filter_text)
         rescue StandardError => e
-          log.info('Error creating filter', e, filter_text: filter_text)
-          next [filter_text, false] if retried
+          tries += 1
+          if tries == 5
+            log.info('Error creating filter', e, filter_text: filter_text)
+            next [filter_text, false]
+          end
 
           retried = true
-          sleep(Random.rand * 2 + 2)
+          sleep(1.5 ** tries + 2 * Random.rand)
 
           retry
         else
