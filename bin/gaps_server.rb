@@ -268,8 +268,7 @@ module Gaps
       content_type :json
       category = params[:category]
       if group = Gaps::DB::Group.find(params[:group])
-        group.category = category
-        group.save
+        group.move_category(category)
         {'group' => params[:group], 'category' => category}.to_json
       else
         not_found

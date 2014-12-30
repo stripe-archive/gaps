@@ -64,7 +64,9 @@ EOF
 
     def parse_config_from_description
       desc = self.description || ''
-      last = desc.split("\n")[-1]
+      self.description, last = desc.split(/\n(?=\S+$)/) # regex for splitting only on last \n
+      return {} if last.nil?
+
       begin
         config = JSON.parse(last)
         unless config.kind_of?(Hash)
@@ -105,9 +107,8 @@ EOF
 
       self.config = parse_config_from_description
       self.deleted = false
-      # Heuristically guess the group's category. TODO: consider
-      # persisting this in the group's description tag.
-      self.category ||= self.group_email.split(/[@-]/)[0]
+
+      self.category ||= self.config.has_key?(:category) ? self.config[:category] : self.group_email.split(/[@-]/)[0]
     end
 
     def memberships
@@ -144,6 +145,13 @@ EOF
       !('true' == settings['showInGroupDirectory'] &&
         ['ANYONE_CAN_JOIN', 'ALL_IN_DOMAIN_CAN_JOIN'].include?(settings['whoCanJoin']) &&
         ['ANYONE_CAN_VIEW', 'ALL_IN_DOMAIN_CAN_VIEW'].include?(settings['whoCanViewGroup']))
+    end
+
+    def move_category(new_category)
+      self.config[:category] = self.category = new_category
+      User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON({category:new_category})}")
+
+      save!
     end
 
     def self.boot
@@ -190,11 +198,13 @@ EOF
             log.info("Creating a new group", group: group)
             # Don't notify about display-restricted lists
             group.notify_creation if initialized && !group.hidden?
-            group.save!
           elsif group.changed?
             log.info("Updating existing group", group: group)
-            group.save!
           end
+
+          # Need to save group since we're extracting the config hash from group description
+          # via :parse_config_from_description
+          group.save!
 
           group._id
         end
