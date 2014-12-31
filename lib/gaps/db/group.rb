@@ -63,21 +63,30 @@ EOF
     end
 
     def parse_config_from_description
-      desc = self.description || ''
-      self.description, last = desc.split(/\n(?=\S+$)/) # regex for splitting only on last \n
-      return {} if last.nil?
+      desc_and_config_strings = try_extracting_config_from_raw_description_string
+      return {} if !desc_and_config_strings
 
       begin
-        config = JSON.parse(last)
+        possible_json_string = desc_and_config_strings[1]
+        config = JSON.parse(possible_json_string)
         unless config.kind_of?(Hash)
-          log.error("Ignoring invalid JSON tag", last_line: last, group_email: group_email)
+          log.error("Ignoring invalid JSON tag", last_line: possible_json_string, group_email: group_email)
           config = {}
+        else
+          self.description = desc_and_config_strings[0]
         end
       rescue JSON::ParserError, TypeError => e
         config = {}
       end
 
       config
+    end
+
+    def try_extracting_config_from_raw_description_string #  split_multiline_description_from_config_string
+      desc = self.description || ''
+      cr_index = desc.rindex(/\n/)
+
+      cr_index.nil? ? false : [desc[0..cr_index-1], desc[cr_index+1..desc.length]]
     end
 
     def default_filter_label
@@ -151,12 +160,13 @@ EOF
       update_config if configatron.persist_config_to_group # reload config from group description to minimize data loss
       self.config['category'] = self.category = new_category
 
-      configatron.persist_config_to_group ? persist_config : save!
+      persist_config if configatron.persist_config_to_group
+
+      save!
     end
 
     def persist_config
       User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON(self.config)}")
-      save!
     end
 
     def self.boot
