@@ -67,10 +67,9 @@ EOF
       return {} if !last_line_split
 
       begin
-        possible_json_string = last_line_split[1]
-        config = JSON.parse(possible_json_string)
+        config = JSON.parse(last_line_split[1])
         unless config.kind_of?(Hash)
-          log.error("Ignoring invalid JSON tag", last_line: possible_json_string, group_email: group_email)
+          log.error("Ignoring invalid JSON tag", last_line: last_line_split[1], group_email: group_email)
           config = {}
         else
           self.description = last_line_split[0]
@@ -84,9 +83,8 @@ EOF
 
     def split_last_line_from_description
       desc = self.description || ''
-      cr_index = desc.rindex(/\n/)
-
-      cr_index.nil? ? false : [desc[0..cr_index-1], desc[cr_index+1..desc.length]]
+      lines = desc.split("\n")
+      lines.length > 1 ? [lines[0...-1].join("\n"), lines[-1]] : false
     end
 
     def default_filter_label
