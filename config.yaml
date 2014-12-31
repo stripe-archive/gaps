@@ -48,5 +48,7 @@ default: &default
   # probably power other features.
   populate_group_settings: true
 
+  persist_config_to_group: false
+
 development: *default
 production: *default

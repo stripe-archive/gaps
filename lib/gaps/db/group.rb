@@ -108,7 +108,7 @@ EOF
       self.config = parse_config_from_description
       self.deleted = false
 
-      self.category ||= self.config.has_key?(:category) ? self.config[:category] : self.group_email.split(/[@-]/)[0]
+      self.category ||= self.config.has_key?('category') ? self.config['category'] : self.group_email.split(/[@-]/)[0]
     end
 
     def memberships
@@ -148,9 +148,14 @@ EOF
     end
 
     def move_category(new_category)
-      self.config[:category] = self.category = new_category
-      User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON({category:new_category})}")
+      update_config if configatron.persist_config_to_group # reload config from group description to minimize data loss
+      self.config['category'] = self.category = new_category
 
+      configatron.persist_config_to_group ? persist_config : save!
+    end
+
+    def persist_config
+      User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON(self.config)}")
       save!
     end
 
@@ -198,13 +203,11 @@ EOF
             log.info("Creating a new group", group: group)
             # Don't notify about display-restricted lists
             group.notify_creation if initialized && !group.hidden?
+            group.save!
           elsif group.changed?
             log.info("Updating existing group", group: group)
+            group.save!
           end
-
-          # Need to save group since we're extracting the config hash from group description
-          # via :parse_config_from_description
-          group.save!
 
           group._id
         end

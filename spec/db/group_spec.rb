@@ -44,7 +44,7 @@ describe "Group" do
     end
   end
 
-  context "Updates Google Group Description when moving Category" do
+  context "Move category" do
     before do
       # Stub Mongodb, until we want test environments and test mongodbs
       allow(MongoMapper).to receive_messages(database: double.as_null_object)
@@ -52,9 +52,20 @@ describe "Group" do
       group.category = "oldcategory"
     end
 
-    it "triggers google group update api call" do
-      allow(Gaps::DB::User).to receive_message_chain(:lister, :requestor).and_return(requestor)
-      expect_any_instance_of(Gaps::Requestor).to receive(:update_group_description)
+    it "persists to mongodb directly if configatron.persist_config_to_group is false" do
+      configatron.persist_config_to_group = false
+
+      expect(group).to_not receive(:update_config)
+      expect(group).to_not receive(:persist_config)
+
+      group.move_category("Misc")
+    end
+
+    it "reloads config from group description (to minimize data loss) and triggers google group update api call" do
+      configatron.persist_config_to_group = true
+
+      expect(group).to receive(:update_config)
+      expect(group).to receive(:persist_config)
 
       group.move_category("Misc")
     end
