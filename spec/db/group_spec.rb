@@ -19,30 +19,15 @@ describe "Group" do
   let(:invalid_json_description){ "#{group_description}\n#{invalid_json}" }
   let(:invalid_json_multiline_description){ "#{multiline_group_description}\n#{invalid_json}" }
 
-  context "#try_extracting_config_from_raw_description_string" do
+  context "#split_last_line_from_description" do
     it "single line description" do
-      group.description = valid_json_description
-      expect(group.try_extracting_config_from_raw_description_string).to eq([group_description, valid_json])
-    end
-
-    it "multi line description" do
-      group.description = valid_multiline_json_description
-      expect(group.try_extracting_config_from_raw_description_string).to eq([multiline_group_description, valid_json])
-    end
-
-    it "no config in json" do
       group.description = group_description
-      expect(group.try_extracting_config_from_raw_description_string).to_not be
+      expect(group.split_last_line_from_description).to_not be
     end
 
-    it "returns invalid json string as is" do
+    it "multi-line description" do
       group.description = invalid_json_description
-      expect(group.try_extracting_config_from_raw_description_string).to eq([group_description, invalid_json])
-    end
-
-    it "returns invalid json string as is (multi-line description)" do
-      group.description = invalid_json_multiline_description
-      expect(group.try_extracting_config_from_raw_description_string).to eq([multiline_group_description, invalid_json])
+      expect(group.split_last_line_from_description).to eq([group_description, invalid_json])
     end
   end
 

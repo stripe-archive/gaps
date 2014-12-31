@@ -63,17 +63,17 @@ EOF
     end
 
     def parse_config_from_description
-      desc_and_config_strings = try_extracting_config_from_raw_description_string
-      return {} if !desc_and_config_strings
+      last_line_split = split_last_line_from_description
+      return {} if !last_line_split
 
       begin
-        possible_json_string = desc_and_config_strings[1]
+        possible_json_string = last_line_split[1]
         config = JSON.parse(possible_json_string)
         unless config.kind_of?(Hash)
           log.error("Ignoring invalid JSON tag", last_line: possible_json_string, group_email: group_email)
           config = {}
         else
-          self.description = desc_and_config_strings[0]
+          self.description = last_line_split[0]
         end
       rescue JSON::ParserError, TypeError => e
         config = {}
@@ -82,7 +82,7 @@ EOF
       config
     end
 
-    def try_extracting_config_from_raw_description_string #  split_multiline_description_from_config_string
+    def split_last_line_from_description
       desc = self.description || ''
       cr_index = desc.rindex(/\n/)
 
