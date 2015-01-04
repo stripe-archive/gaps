@@ -115,6 +115,8 @@ module Gaps
       when 'normal'
       when 'lister'
         authorization_options[:access_type] = :offline
+        authorization_options[:approval_prompt] = :force if Gaps::DB::User.lister.nil?
+        
         scopes += configatron.oauth.lister_scopes
       else
         die "Invalid login type: #{type.inspect}"
