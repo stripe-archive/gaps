@@ -62,29 +62,39 @@ EOF
         )
     end
 
-    def parse_config_from_description
-      last_line_split = split_last_line_from_description
-      return {} if !last_line_split
+    # Parse the description into freeform-text and a config hash
+    def parse_description
+      desc = self.description
+      text, tag = split_last_line(desc)
 
       begin
-        config = JSON.parse(last_line_split[1])
+        config = JSON.parse(tag)
         unless config.kind_of?(Hash)
-          log.error("Ignoring invalid JSON tag", last_line: last_line_split[1], group_email: group_email)
+          log.error("Ignoring non-hash JSON tag", text: text, tag: tag, group_email: group_email)
+          text = desc
           config = {}
-        else
-          self.description = last_line_split[0]
         end
-      rescue JSON::ParserError, TypeError => e
+      rescue JSON::ParserError
+        text = desc
         config = {}
       end
 
-      config
+      [text, config]
     end
 
-    def split_last_line_from_description
-      desc = self.description || ''
-      lines = desc.split("\n")
-      lines.length > 1 ? [lines[0...-1].join("\n"), lines[-1]] : false
+    def split_last_line(str)
+      lines = str.split("\n")
+      [lines[0...-1].join("\n"), lines[-1] || '']
+    end
+
+    # Regenerate the description, using the group's parsed config hash
+    # in place of the existing config tag.
+    def generate_description
+      text, _ = parse_description
+      parts = []
+      parts << text if text.length > 0
+      parts << JSON.generate(config) if config && config.length > 0
+      parts.join("\n")
     end
 
     def default_filter_label
@@ -98,7 +108,9 @@ EOF
       label.gsub(%r{\Aall(/.*)?\z}) { "everyone#{$1}" }
     end
 
-    def update_config(user=User.lister)
+    # Updates the properties on this group object. If no groupinfo is
+    # provided, will automatically retrieve from API.
+    def update_config(groupinfo, user=User.lister)
       if configatron.populate_group_settings
         begin
           settings = user.requestor.get_group_settings(self.group_email)
@@ -112,10 +124,17 @@ EOF
         self.group_settings = settings
       end
 
-      self.config = parse_config_from_description
+      groupinfo ||= user.requestor.get_group(self.group_email)
+
+      self.description = groupinfo.fetch('description')
+      self.direct_members_count = groupinfo.fetch('directMembersCount')
+
+      _, config = parse_description
+      self.config = config
       self.deleted = false
 
-      self.category ||= self.config.has_key?('category') ? self.config['category'] : self.group_email.split(/[@-]/)[0]
+      fallback = self.group_email.split(/[@-]/)[0]
+      self.category ||= self.config.fetch('category', fallback)
     end
 
     def memberships
@@ -155,16 +174,25 @@ EOF
     end
 
     def move_category(new_category)
-      update_config if configatron.persist_config_to_group # reload config from group description to minimize data loss
-      self.config['category'] = self.category = new_category
+      if configatron.persist_config_to_group
+        # Make sure we have an up-to-date description
+        update_config(nil)
+        # Set the new category
+        self.config['category'] = new_category
+        # Update the description currently stored on the group
+        self.description = generate_description
+        # Save it back via the API
+        persist_description
+      end
 
-      persist_config if configatron.persist_config_to_group
-
+      self.category = new_category
       save!
     end
 
-    def persist_config
-      User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON(self.config)}")
+    def persist_description
+      User.lister.requestor.update_group_description(
+        group_email, self.description
+        )
     end
 
     def self.boot
@@ -203,9 +231,7 @@ EOF
           next if email =~ /-deleted/
 
           group = find_or_initialize_by_group_email(email)
-          group.description = groupinfo.fetch('description')
-          group.direct_members_count = groupinfo.fetch('directMembersCount')
-          group.update_config(user)
+          group.update_config(groupinfo, user)
 
           if group.new_record?
             log.info("Creating a new group", group: group)

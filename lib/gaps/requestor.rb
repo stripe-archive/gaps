@@ -132,6 +132,12 @@ module Gaps
         )
     end
 
+    def get_group(group_email)
+      request(:lister, "Retrieving group object",
+        uri: uri('https://www.googleapis.com/admin/directory/v1/groups', group_email)
+        )
+    end
+
     private
 
     def uri(*args)
