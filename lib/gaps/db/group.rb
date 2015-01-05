@@ -63,19 +63,28 @@ EOF
     end
 
     def parse_config_from_description
-      desc = self.description || ''
-      last = desc.split("\n")[-1]
+      last_line_split = split_last_line_from_description
+      return {} if !last_line_split
+
       begin
-        config = JSON.parse(last)
+        config = JSON.parse(last_line_split[1])
         unless config.kind_of?(Hash)
-          log.error("Ignoring invalid JSON tag", last_line: last, group_email: group_email)
+          log.error("Ignoring invalid JSON tag", last_line: last_line_split[1], group_email: group_email)
           config = {}
+        else
+          self.description = last_line_split[0]
         end
       rescue JSON::ParserError, TypeError => e
         config = {}
       end
 
       config
+    end
+
+    def split_last_line_from_description
+      desc = self.description || ''
+      lines = desc.split("\n")
+      lines.length > 1 ? [lines[0...-1].join("\n"), lines[-1]] : false
     end
 
     def default_filter_label
@@ -105,9 +114,8 @@ EOF
 
       self.config = parse_config_from_description
       self.deleted = false
-      # Heuristically guess the group's category. TODO: consider
-      # persisting this in the group's description tag.
-      self.category ||= self.group_email.split(/[@-]/)[0]
+
+      self.category ||= self.config.has_key?('category') ? self.config['category'] : self.group_email.split(/[@-]/)[0]
     end
 
     def memberships
@@ -144,6 +152,19 @@ EOF
       !('true' == settings['showInGroupDirectory'] &&
         ['ANYONE_CAN_JOIN', 'ALL_IN_DOMAIN_CAN_JOIN'].include?(settings['whoCanJoin']) &&
         ['ANYONE_CAN_VIEW', 'ALL_IN_DOMAIN_CAN_VIEW'].include?(settings['whoCanViewGroup']))
+    end
+
+    def move_category(new_category)
+      update_config if configatron.persist_config_to_group # reload config from group description to minimize data loss
+      self.config['category'] = self.category = new_category
+
+      persist_config if configatron.persist_config_to_group
+
+      save!
+    end
+
+    def persist_config
+      User.lister.requestor.update_group_description(group_email, "#{description}\n#{JSON(self.config)}")
     end
 
     def self.boot

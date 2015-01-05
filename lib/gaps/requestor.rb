@@ -92,6 +92,17 @@ module Gaps
         )
     end
 
+    def update_group_description(group_email, group_description)
+      request(:lister, "Updating #{group_email}'s description",
+        uri: uri('https://www.googleapis.com/groups/v1/groups', group_email),
+        http_method: 'put',
+        headers: {'Content-Type' => 'application/json'},
+        body: JSON.generate(
+          description: group_description
+          )
+        )
+    end
+
     def remove_from_group(group_email)
       request(:lister, "Removing user from group",
         uri: uri('https://www.googleapis.com/admin/directory/v1/groups', group_email, 'members', user.email),

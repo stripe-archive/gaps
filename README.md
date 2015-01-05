@@ -112,8 +112,6 @@ Gaps doesn't yet support. For example:
   your lists to have a standard set of configuration (such as Public
   posting, etc). Gaps could ensure that all lists in your domain have
   the appropriate settings.
-- Persisting your group categorization settings back to the Group (as
-  part of its description tag).
 - More flexible filter generation, or better story for clearing
   filters.
 - Displaying your private lists.
