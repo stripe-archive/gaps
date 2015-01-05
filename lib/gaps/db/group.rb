@@ -10,9 +10,10 @@ module Gaps::DB
 
     key :deleted, Boolean, default: false
 
-    key :category, String
     key :config, Hash # config JSON tag in description
     key :group_settings, Hash
+
+    key :category, String # legacy
 
     def self.build_index
       self.ensure_index(:group_email, unique: true)
@@ -20,6 +21,10 @@ module Gaps::DB
 
     def self.thread_pool
       @thread_pool ||= Thread::Pool.new(configatron.cache.pool_size)
+    end
+
+    def category
+      self.config['category'] || super
     end
 
     ### API methods
@@ -130,11 +135,10 @@ EOF
       self.direct_members_count = groupinfo.fetch('directMembersCount')
 
       _, config = parse_description
+      config['category'] ||= self.group_email.split(/[@-]/)[0]
+
       self.config = config
       self.deleted = false
-
-      fallback = self.group_email.split(/[@-]/)[0]
-      self.category ||= self.config.fetch('category', fallback)
     end
 
     def memberships
