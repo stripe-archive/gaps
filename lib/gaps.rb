@@ -14,6 +14,14 @@ module Gaps
   include Chalk::Log
 
   def self.init
+    essential_init
+
+    Gaps::DB.init
+    Gaps::DB::Cache.start_cache_lookup
+  end
+
+  # Init needed in the tests
+  def self.essential_init
     Thread.abort_on_exception = true
 
     Gaps::Third::YAMLUtils.make_yaml_safe!
@@ -29,9 +37,6 @@ module Gaps
       $stderr.puts "ERROR: It looks like you have no `site.yaml` file. Please copy the `site.yaml.sample` to `site.yaml` and populate the fields, per https://github.com/stripe/gaps#configuring"
       exit(1)
     end
-
-    Gaps::DB.init
-    Gaps::DB::Cache.start_cache_lookup
   end
 end
 

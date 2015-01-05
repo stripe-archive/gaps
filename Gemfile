@@ -28,8 +28,5 @@ gem 'mail'
 gem 'gmail-britta', :git => 'git://github.com/bkrausz/gmail-britta.git', :ref => 'ced6355443fe2b99f6414b2da096c70a38b23f98'
 
 group :development, :test do
-  gem 'pry-byebug'
-  gem 'rb-readline'
-  gem 'rack-test'
-  gem 'rspec'
+  gem 'mocha'
 end
