@@ -23,8 +23,9 @@ module Gaps::DB
       @thread_pool ||= Thread::Pool.new(configatron.cache.pool_size)
     end
 
+    alias :legacy_category :category
     def category
-      self.config['category'] || super
+      self.config['category'] || legacy_category
     end
 
     ### API methods
@@ -135,7 +136,7 @@ EOF
       self.direct_members_count = groupinfo.fetch('directMembersCount')
 
       _, config = parse_description
-      config['category'] ||= self.group_email.split(/[@-]/)[0]
+      config['category'] ||= self.legacy_category || self.group_email.split(/[@-]/)[0]
 
       self.config = config
       self.deleted = false
