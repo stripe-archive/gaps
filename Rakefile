@@ -14,5 +14,10 @@ namespace :deploy do
 end
 
 Rake::TestTask.new do |t|
-  t.pattern = "test/**/*.rb"
+  t.libs = ["lib"]
+  # t.warning = true
+  t.verbose = true
+  t.test_files = FileList['test/**/*.rb'].reject do |file|
+    file.end_with?('_lib.rb') || file.include?('/_lib/')
+  end
 end
