@@ -196,7 +196,7 @@ module Gaps
         end
       rescue Google::APIClient::ServerError => e
         if e.message =~ /\ABackend Error/
-          if !opts.has_key?(:noretry) || !opts[:noretry]
+          if !opts[:noretry]
             retry
           else
             raise
