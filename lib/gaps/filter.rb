@@ -30,6 +30,9 @@ module Gaps::Filter
         tries = 0
         begin
           user_object.requestor.create_filter(filter_text)
+        rescue Google::APIClient::ServerError => e
+          log.info('Server error, cannot create filter', e, filter_text: filter_text)
+          next [filter_text, false]
         rescue StandardError => e
           tries += 1
           if tries == 5
