@@ -172,7 +172,7 @@ module Gaps
 
       client = get_client(client_spec)
 
-      server_error_retry_limit, rate_limit = 0
+      server_error_retry_limit = rate_limit = 0
       invalid_credentials = false
       begin
         response = client.execute!(
