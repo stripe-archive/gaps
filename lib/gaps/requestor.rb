@@ -172,7 +172,7 @@ module Gaps
 
       client = get_client(client_spec)
 
-      rate_limit = 0
+      server_error_retry_limit, rate_limit = 0
       invalid_credentials = false
       begin
         response = client.execute!(
@@ -196,7 +196,9 @@ module Gaps
         end
       rescue Google::APIClient::ServerError => e
         if e.message =~ /\ABackend Error/
-          if !opts[:noretry]
+          if !opts[:noretry] && server_error_retry_limit < 5
+            server_error_retry_limit += 1
+            sleep(5) # assumption: exponential backoff not required for server errors
             retry
           else
             raise

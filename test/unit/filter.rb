@@ -16,6 +16,17 @@ class FilterTest < Critic::Unit::Test
   end
 
   class FakeRequestor
+    attr_reader :create_filter_count
+
+    def initialize(error)
+      @error = error
+      @create_filter_count = 0
+    end
+
+    def create_filter(fake_filter_text)
+      @create_filter_count += 1
+      raise @error
+    end
   end
 
   def a_user
@@ -29,21 +40,18 @@ class FilterTest < Critic::Unit::Test
     end
 
     it "does not retry on Google::APIClient::ServerError" do
-      fake_requestor = FakeRequestor.new
-      fake_requestor.stubs(:create_filter).at_most(1).raises(Google::APIClient::ServerError, "Backend Error")
+      fake_requestor = FakeRequestor.new(Google::APIClient::ServerError.new("Backend Error"))
       a_user.stubs(:requestor).returns(fake_requestor)
-
       Gaps::Filter.upload_to_gmail(a_user)
+      assert_equal 1, fake_requestor.create_filter_count
     end
 
     it "retries on StandardError" do
-      Gaps::Filter.stubs(:sleep)
-
-      fake_requestor = FakeRequestor.new
-      fake_requestor.stubs(:create_filter).at_least(2).raises(StandardError, "Backend Error")
+      Gaps::Filter.stubs(:sleep) # sleeps during retry
+      fake_requestor = FakeRequestor.new(StandardError.new)
       a_user.stubs(:requestor).returns(fake_requestor)
-
       Gaps::Filter.upload_to_gmail(a_user)
+      assert fake_requestor.create_filter_count > 2
     end
   end
 end
