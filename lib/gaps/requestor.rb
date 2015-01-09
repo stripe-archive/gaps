@@ -122,7 +122,8 @@ module Gaps
         uri: uri('https://apps-apis.google.com/a/feeds/emailsettings/2.0', configatron.info.domain, user_name, 'filter'),
         http_method: 'post',
         headers: {'Content-Type' => 'application/atom+xml'},
-        body: body
+        body: body,
+        noretry: true
         )
     end
 
@@ -171,7 +172,7 @@ module Gaps
 
       client = get_client(client_spec)
 
-      rate_limit = 0
+      server_error_retry_limit, rate_limit = 0
       invalid_credentials = false
       begin
         response = client.execute!(
@@ -190,6 +191,18 @@ module Gaps
           log.info('Just hit rate limit', rate_limit: rate_limit, sleep: sleeping)
           sleep(sleeping)
           retry
+        else
+          raise
+        end
+      rescue Google::APIClient::ServerError => e
+        if e.message =~ /\ABackend Error/
+          if !opts[:noretry] && server_error_retry_limit < 5
+            server_error_retry_limit += 1
+            sleep(5) # assumption: exponential backoff not required for server errors
+            retry
+          else
+            raise
+          end
         else
           raise
         end
