@@ -97,5 +97,24 @@ class GroupTest < Critic::Unit::Test
         assert_equal('custom', group.category)
       end
     end
+
+    describe 'configatron.persist_config_to_group = false' do
+      before do
+        configatron.unlock! do
+          configatron.persist_config_to_group = false
+        end
+      end
+
+      it 'move_category always overrides category' do
+        group = a_group
+        group.update_config(groupinfo(
+            'description' => '{"category": "original"}'
+            ))
+        assert_equal('original', group.category)
+
+        group.move_category('custom')
+        assert_equal('custom', group.category)
+      end
+    end
   end
 end

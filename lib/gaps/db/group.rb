@@ -27,6 +27,10 @@ module Gaps::DB
       self.config['category'] || super
     end
 
+    def category=(category)
+      self.config['category'] = category
+    end
+
     ### API methods
 
     # Could technically have multiple @s, I guess, but whatever.
@@ -188,9 +192,10 @@ EOF
         self.description = generate_description
         # Save it back via the API
         persist_description
+      else
+        self.category = new_category
       end
 
-      self.category = new_category
       save!
     end
 
