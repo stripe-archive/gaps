@@ -135,7 +135,8 @@ EOF
       self.direct_members_count = groupinfo.fetch('directMembersCount')
 
       _, config = parse_description
-      config['category'] ||= self.group_email.split(/[@-]/)[0]
+      # Keep the existing category if one set
+      config['category'] ||= self.category || self.group_email.split(/[@-]/)[0]
 
       self.config = config
       self.deleted = false

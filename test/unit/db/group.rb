@@ -89,6 +89,13 @@ class GroupTest < Critic::Unit::Test
         group.move_category('custom')
         assert_equal(%Q(#{desc}\n{"category":"custom"}), group.description)
       end
+
+      it 'preserves locally-set categories' do
+        group = a_group
+        group.move_category('custom')
+        group.update_config(groupinfo)
+        assert_equal('custom', group.category)
+      end
     end
   end
 end
