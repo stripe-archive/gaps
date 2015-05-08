@@ -7,7 +7,7 @@ module Gaps
 
     def self.init
       MongoMapper.database = configatron.db.database
-      MongoMapper.connection = Mongo::MongoClient.from_uri(configatron.db.mongodb_url)
+      MongoMapper.connection = Mongo::MongoClient.from_uri(configatron.db.mongodb_url, pool_size: 5)
 
       Cache.build_index
       Group.build_index
