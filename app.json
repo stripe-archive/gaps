@@ -2,5 +2,27 @@
   "name": "gaps",
   "addons":[
     "mongolab"
-  ]
+  ],
+  "env":{
+    "ORG_DOMAIN": {
+      "required": true
+    },
+    "ORG_NAME": {
+      "required": true
+    },
+    "OAUTH_CLIENT_ID": {
+      "required": true
+    },
+    "OAUTH_CLIENT_SECRET": {
+      "required": true
+    },
+    "OAUTH_REDIRECT_URL": {
+      "required": true
+    },
+    "SESSION_SECRET": {
+      "required": true,
+      "description": "A secret key for sessions.",
+      "generator": "secret"
+    },
+  }
 }
