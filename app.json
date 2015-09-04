@@ -23,6 +23,6 @@
       "required": true,
       "description": "A secret key for sessions.",
       "generator": "secret"
-    },
+    }
   }
 }
