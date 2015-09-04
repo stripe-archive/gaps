@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Parse MongoLab's URI
+if [ -n "${MONGOLAB_URI+1}" ]; then
+  MONGODB_URL=$MONGOLAB_URI
+fi
+
+# Error if nothing found
+if [ -z "${MONGODB_URL}" ]; then
+  echo "Probs not gonna work, needs a MONGODB URL"
+  exit 1
+fi
+
+# Parse out the DB
+arr=(${MONGODB_URL//\// })
+MONGODB_DATABASE=${arr[2]}
+
 cat <<EOF > site.yaml
 db:
   database: $MONGODB_DATABASE
