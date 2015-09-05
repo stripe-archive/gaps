@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Parse MongoLab's URI
+if [ -n "${MONGOLAB_URI+1}" ]; then
+  MONGODB_URL=$MONGOLAB_URI
+fi
+
+# Error if nothing found
+if [ -z "${MONGODB_URL}" ]; then
+  echo "Probs not gonna work, needs a MONGODB URL"
+  exit 1
+fi
+
+# Parse out the DB
+arr=(${MONGODB_URL//\// })
+MONGODB_DATABASE=${arr[2]}
+
+cat <<EOF > site.yaml
+db:
+  database: $MONGODB_DATABASE
+  mongodb_url: $MONGODB_URL
+
+favicon: $FAVICON_URL
+
+gaps_url: $GAPS_URL
+
+info:
+  domain: $ORG_DOMAIN
+  company_name: $ORG_NAME
+
+notify:
+  send_email: false
+  to: all-bots@example.com
+  from: all@example.com
+
+oauth:
+  client_id: $OAUTH_CLIENT_ID
+  client_secret: $OAUTH_CLIENT_SECRET
+  redirect_uri: $OAUTH_REDIRECT_URL
+
+port: $PORT
+
+session:
+  secret: $SESSION_SECRET
+  secure: true
+EOF
+
+exec bundle exec bin/gaps_server.rb

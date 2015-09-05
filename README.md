@@ -2,6 +2,8 @@
 
 Easy management of your Google Apps email configuration.
 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
 # Overview
 
 At Stripe, we've long had many
@@ -26,7 +28,7 @@ ones.
 
 # What it looks like
 
-![Gaps](https://www.dropbox.com/s/x9y1tus9x2myjey/gaps.png?dl=1)
+![Gaps](screenshot.png)
 
 # Configuring
 
@@ -67,6 +69,10 @@ You can run Gaps directly or under Docker.
 Run `bundle install` to install your dependencies. Gaps should run on
 Ruby 1.9 and up. Then execute `bin/gaps_server.rb` (or
 `bin/dev-runner` if you want auto-reloading upon code changes).
+
+## Running on Heroku
+
+Just click here: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## Running under Docker
 
