@@ -11,8 +11,8 @@ quotes = [
     <title>Gaps</title>
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="css/gaps.css" rel="stylesheet" media="screen">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link href="/css/gaps.css" rel="stylesheet" media="screen">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -38,6 +38,9 @@ quotes = [
           </li>
           <li class='<%= active_if_on('/filters') %>'>
             <a href="/filters">Filters</a>
+          </li>
+          <li class='<%= active_if_on('/sets') %>'>
+            <a href="/sets">Suggested Sets</a>
           </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
@@ -78,8 +81,8 @@ quotes = [
   </div>
   <script src="//code.jquery.com/jquery.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/gaps.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/gaps.js"></script>
   <script>
     window.CSRF = '<%== csrf_token %>';
     $('.dropdown-toggle').dropdown();

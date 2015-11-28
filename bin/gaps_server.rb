@@ -264,6 +264,62 @@ module Gaps
       redirect '/filters'
     end
 
+    ## Suggested Sets
+
+    get '/sets', auth: true do
+      @sets = Gaps::DB::Set.find_each
+      erb :sets
+    end
+
+    post '/sets', auth: true do
+      set_id = params[:set]
+      log.info('Adding user to subscription set', set: set_id, user: @user.email)
+      Gaps::DB::Set.find(set_id).groups_.each do |group|
+        membership = @user.group_member?(group)
+        through_list = @user.group_member_through_list(group)
+        direct_membership = membership && !through_list
+        if !direct_membership
+          if !group.viewable?(@user)
+            die("Trying to update subscription to a group you do not have permission to access: #{group._id}")
+          end
+
+          @user.requestor.add_to_group(group.group_email)
+        end
+      end
+
+      redirect '/'
+    end
+
+    get '/sets/:id', auth: true do
+      if params[:id] != 'new'
+        @set = Gaps::DB::Set.find(params[:id])
+        return not_found unless @set
+      end
+      @groups = Gaps::DB::Group.categorized(@user)
+      erb :set, :locals => {:group_partial => :_set_group}
+    end
+
+    post '/sets/:id', auth: true do
+      args = {
+        name: params[:name],
+        description: params[:description],
+        groups: params[:group].keys,
+      }
+
+      if params[:id] == 'new'
+        Gaps::DB::Set.new(args).save
+      else
+        set = Gaps::DB::Set.find(params[:id])
+        return not_found unless set
+        args.each do |key, value|
+          set.send(:"#{key}=", value)
+        end
+        set.save
+      end
+
+      redirect '/sets'
+    end
+
     ## AJAXy things:
 
     post '/ajax/groups/:group/move', auth: true do

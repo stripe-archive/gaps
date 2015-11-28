@@ -1,0 +1,35 @@
+<div class="well">
+<p> These are recommended sets of groups you can subscribe yourself to, in order to make initial setup easier. </p>
+
+</div>
+
+<div id="categories">
+  <% @sets.each do |set| %>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="btn-group pull-right move-dropdown">
+          <button type="button" class="btn btn-xs dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></button>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <span class="input-group">
+                <span class="input-group-addon">
+                  <a href="/sets/<%= set._id %>">Edit Set</a>
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+        <h4 class="list-group-item-heading"><%= set.name %></h4>
+        <p class="list-group-item-text"><%= set.description %></p>
+        <p class="list-group-item-text"><%= set.groups_.map(&:group_email).join(', ') %></p>
+        <form method="POST" action="/sets">
+          <%== csrf_tag %>
+          <input type="hidden" name="set" value="<%= set._id %>" />
+          <p> <input type="submit" value="Add me to these groups" /> </p>
+        </form>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<p> <a href="/sets/new">Create a new set</a> </p>
