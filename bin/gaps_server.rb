@@ -287,6 +287,9 @@ module Gaps
         end
       end
 
+      @user.sets << set_id
+      @user.save
+
       redirect '/'
     end
 
@@ -311,10 +314,15 @@ module Gaps
       else
         set = Gaps::DB::Set.find(params[:id])
         return not_found unless set
+
+        old_groups = set.groups
+
         args.each do |key, value|
           set.send(:"#{key}=", value)
         end
         set.save
+
+        set.notify_update(old_groups)
       end
 
       redirect '/sets'

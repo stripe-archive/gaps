@@ -24,6 +24,8 @@ module Gaps::DB
     key :alternate_emails, Array, :default => []
     key :filters, Hash, :default => {}
 
+    key :sets, Array, :default => []
+
     def self.build_index
       self.ensure_index([[:google_id, 1]], unique: true, sparse: true)
     end

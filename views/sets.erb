@@ -1,5 +1,8 @@
 <div class="well">
-<p> These are recommended sets of groups you can subscribe yourself to, in order to make initial setup easier. </p>
+<p>
+  These are recommended sets of groups you can subscribe yourself to, in order to make initial setup easier.
+  If a set changes we will email you, we will not automatically subscribe you to lists.
+</p>
 
 </div>
 
@@ -19,7 +22,12 @@
             </li>
           </ul>
         </div>
-        <h4 class="list-group-item-heading"><%= set.name %></h4>
+        <h4 class="list-group-item-heading">
+          <%= set.name %>
+          <% if @user.sets.include?(set._id) %>
+            <span class="label label-primary">subscribed to set changes</span>
+          <% end %>
+        </h4>
         <p class="list-group-item-text"><%= set.description %></p>
         <p class="list-group-item-text"><%= set.groups_.map(&:group_email).join(', ') %></p>
         <form method="POST" action="/sets">
