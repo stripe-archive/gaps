@@ -10,5 +10,3 @@
 <% end %>
 </div>
 <p> Total: <b><%= @groups.inject(0) {|count, (_, groups)| count + groups.count} %></b> lists </p>
-
-<p> You are a member of <b><%= @user.group_member_count %></b> <%= @user.group_member_count == 1 ? 'group' : 'groups' %>. </p>

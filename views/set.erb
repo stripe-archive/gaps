@@ -1,0 +1,24 @@
+<div class="well">
+<p> You are editing a set of recommended groups. </p>
+</div>
+
+  <form method="POST" action="/sets/<%= @set ? @set._id : 'new' %>">
+  <%== csrf_tag %>
+
+<p> List name: <input type="text" name="name" value="<%= @set ? @set.name : '' %>" /> </p>
+
+<p> List description: <input type="text" name="description" value="<%= @set ? @set.description : '' %>" /> </p>
+
+<p> <input type="submit" value="Submit changes" /> </p>
+
+<%== erb :_category_list, :locals => {:groups => @groups} %>
+
+<div id="categories">
+  <% @groups.each do |category, groups| %>
+    <%== erb :_category, :locals => {:category => category, :groups => groups, :group_partial => group_partial} %>
+  <% end %>
+</div>
+
+<p> <input type="submit" value="Submit changes" /> </p>
+  </form>
+</div>

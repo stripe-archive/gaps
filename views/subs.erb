@@ -8,6 +8,8 @@ updated within 10 minutes and an automated email sent to <%= configatron.notify.
 
 <%== erb :_category_list, :locals => {:groups => @groups} %>
 
+<p> You are a member of <b><%= @user.group_member_count %></b> <%= @user.group_member_count == 1 ? 'group' : 'groups' %>. </p>
+
   <form method="POST" action="/subs">
   <%== csrf_tag %>
 <p> <input type="submit" value="Submit changes" /> </p>

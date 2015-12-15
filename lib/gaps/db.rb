@@ -17,6 +17,7 @@ module Gaps
     require_relative 'db/base'
     require_relative 'db/cache'
     require_relative 'db/group'
+    require_relative 'db/set'
     require_relative 'db/state'
     require_relative 'db/user'
   end

@@ -1,0 +1,13 @@
+<%
+in_set = @set ? @set.groups.include?(group._id) : false
+%>
+
+<li class="list-group-item" id='lst-<%= group.group_email %>' data-group-id='<%= group._id %>'>
+  <h4 class="list-group-item-heading">
+    <input type="checkbox" name="group[<%= group._id %>]" <% if in_set %>checked="true"<% end %> />
+    <a href="<%= group.page %>"><%= group.group_email %></a>
+  </h4>
+  <p class="list-group-item-text">
+    <%= group.description %>
+ </p>
+</li>
