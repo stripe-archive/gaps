@@ -22,7 +22,7 @@ module Gaps::DB
         Group.find_each(_id: {:$in => changed_groups}).partition {|group| added_groups.include?(group._id)}
 
       subject = "[gaps] Update to set: #{self.name}"
-      body = "A set you've previously added has been updated.\n\n"
+      body = "A set you subscribe to has been updated.\n\n"
 
       unless added_group_docs.empty?
         body += "The following groups were added:\n"
