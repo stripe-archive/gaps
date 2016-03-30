@@ -1,0 +1,21 @@
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+      - 3500:3500
+    links:
+      - mongo
+    environment:
+      - MONGODB_URL=mongodb://mongo/mongo
+      - RACK_ENV=development
+      - FAVICON_URL=
+      - GAPS_URL=
+      - ORG_DOMAIN=
+      - ORG_NAME=
+      - OAUTH_CLIENT_ID=
+      - OAUTH_CLIENT_SECRET=
+      - OAUTH_REDIRECT_URL=
+      - SESSION_SECRET=
+  mongo:
+    image: mongo

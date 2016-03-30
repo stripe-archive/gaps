@@ -76,10 +76,22 @@ Just click here: [![Deploy](https://www.herokucdn.com/deploy/button.png)](https:
 
 ## Running under Docker
 
-Because there are a lot of settings, running under Docker requires a
-configuration file. Clone this repository and execute
-`bin/docker-runner` to run the Docker image we've published with your
-`site.yaml` bind-mounted inside.
+First, you need to configure Gaps by creating a `.env` file and filling in your configuration:
+
+    ORG_DOMAIN=
+    ORG_NAME=
+    OAUTH_CLIENT_ID=
+    OAUTH_CLIENT_SECRET=
+    OAUTH_REDIRECT_URL=
+    SESSION_SECRET=
+
+To run a local development environment, you can use Docker Compose:
+
+    $ docker-compose up
+
+To run in production, you can just run the image on Docker Hub:
+
+    $ docker run -p 80:3500 --env-file=.env stripeoss/gaps
 
 # Permissions
 
