@@ -175,7 +175,7 @@ EOF
       # permissioning needs).
       self.config['display'] ||
         self.group_email.start_with?('acl-') ||
-        self.group_email.start_with?('private-')
+        self.group_email.start_with?('private-') ||
         self.group_email.end_with?('-confidential')
     end
 
