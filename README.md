@@ -99,6 +99,7 @@ lists:
 
 - Prefixing the name with `private-`.
 - Prefixing the name with the less-cumbersome but more-obscure `acl-`.
+- Suffixing the name with `-confidential`.
 - Adding a JSON tag as the last line of the group description with a
   "display" setting as follows: `{"display": "none"}`
 
