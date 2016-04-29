@@ -50,10 +50,10 @@ site.yaml`. You'll need:
   enabled for your Google Apps domain.
 2. Create a
    [new project](https://console.developers.google.com/project).
-3. Under the "APIs & auth" accordian for that project, select the
+3. Under the "APIs & auth" accordion for that project, select the
    "APIs" tab. Enable the Google+ API, Admin SDK, and Group Settings
    API.
-4. Under the same accordian, select the "Credentials" tab. Create a
+4. Under the same accordion, select the "Credentials" tab. Create a
    new "Web application" Client ID. Add your desired redirect URI and
    authorized origins. (In development that'll probably be
    `http://localhost:3500` and `http://localhost:3500/oauth2callback`,
@@ -87,7 +87,7 @@ Gaps uses your domain admin's credentials to perform most actions
 (listing all groups, joining a group). So permissions are entrusted to
 Gaps's business logic rather than your Google settings directly.
 
-Gaps currrently comes with two schemes to mark a list as private. Any
+Gaps currently comes with two schemes to mark a list as private. Any
 private lists are currently completely omitted from Gaps: they'll be
 left out of the directory listing, their creation won't be emailed
 about, and users won't be able to join them.
