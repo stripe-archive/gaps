@@ -77,6 +77,11 @@ module Gaps
       redirect '/subs'
     end
 
+    get '/opensearch.xml' do
+      content_type :xml
+      erb :opensearch, layout: nil
+    end
+
     get '/status', auth: false do
       if logged_in?
         status 200
