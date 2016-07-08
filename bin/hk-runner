@@ -43,6 +43,11 @@ port: $PORT
 session:
   secret: $SESSION_SECRET
   secure: true
+
+permissions:
+  privacy_settings:
+    gaps_scheme: ${PRIVACY_GAPS_SCHEME:-true}
+    api_scheme: ${PRIVACY_API_SCHEME:-false}
 EOF
 
 exec bundle exec bin/gaps_server.rb
