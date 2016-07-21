@@ -1,4 +1,4 @@
-FROM phusion/passenger-ruby21
+FROM phusion/passenger-ruby21:0.9.19
 MAINTAINER Greg Brockman <gdb@stripe.com>
 ENV PORT 3500
 EXPOSE 3500
