@@ -1,4 +1,4 @@
-ruby '2.1.7'
+ruby '2.1.9'
 
 # Execute bundler hook (analogous to sourcing a dotfile)
 ['~/.', '/etc/'].any? do |file|

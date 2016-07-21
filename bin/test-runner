@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cat >>site.yaml<<EOF
+db:
+  database: gaps
+  mongodb_url: mongodb://localhost:27017
+favicon: foo.ico
+gaps_url: https://gaps.example.com
+info:
+  domain: example.com
+  company_name: Example Company
+notify:
+  send_email: false
+  to: all-bots@example.com
+  from: all@example.com
+oauth:
+  client_id: ""
+  client_secret: ""
+  redirect_uri: http://localhost:3500/oauth2callback
+port: 3500
+session:
+  secret: "reallyonlytesting"
+  secure: false
+EOF
+
+bundle exec rake test
