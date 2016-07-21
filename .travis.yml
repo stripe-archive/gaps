@@ -10,3 +10,10 @@ before_install:
 
 script:
   - docker run --rm stripeoss/gaps:latest ./bin/test-runner
+
+after_success:
+  # Upload the latest master build to docker hub:
+  - if [ "$TRAVIS_PULL_REQUEST" == "false" -a "$TRAVIS_BRANCH" == "master" ]; then
+    docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+    docker push stripeoss/gaps:latest;
+    fi
