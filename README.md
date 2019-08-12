@@ -1,5 +1,7 @@
 # Gaps
 
+:warning: **Gaps is no longer receiving updates from Stripe.** If you'd like to use it in your organization, we recommend reviewing its dependencies for security issues and updating them as needed.
+
 Easy management of your Google Apps email configuration.
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
